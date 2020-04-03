@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, flash
 from flask_mysqldb import MySQL
 from flask_bootstrap import Bootstrap
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -23,13 +23,17 @@ app.config['SECRET_KEY'] = os.urandom(24)
 @app.route('/', methods=['GET', "POST"])
 def index():
     if request.method == 'POST':
-        form = request.form
-        name = form['name']
-        age = form['age']
-        cur = mysql.connection.cursor()
-        # name = generate_password_hash(name) #This takes the password(name) and hashes it. 
-        cur.execute("INSERT INTO employee(name, age) VALUES(%s, %s)", (name, age))
-        mysql.connection.commit()
+        try: #This is for the flash message try is right excpt deal with the fail message
+            form = request.form
+            name = form['name']
+            age = form['age']
+            cur = mysql.connection.cursor()
+            # name = generate_password_hash(name) #This takes the password(name) and hashes it. 
+            cur.execute("INSERT INTO employee(name, age) VALUES(%s, %s)", (name, age))
+            mysql.connection.commit()
+            flash('Successfully', 'success')
+        except:
+            flash('Failed to insert data','danger')
     return render_template('index.html')
 
 

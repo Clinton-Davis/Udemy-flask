@@ -13,19 +13,16 @@ app.config['MYSQL_DB'] = db['mysql_db']
 mysql = MySQL(app)
 
 
-@app.route('/')
+@app.route('/', methods=['GET', "POST"])
 def index():
-    cur = mysql.connection.cursor()
-    result_value = cur.execute("SELECT * FROM user")
-    if result_value > 0:
-        user = cur.fetchall()
-        return user[0]
+    if request.method == 'POST':
+        form = request.form
+        name = form['name']
+        age = form['age']
+        cur = mysql.connection.cursor()
+        cur.execute("INSERT INTO employee(name, age) VALUES(%s, %s)", (name, age))
+        mysql.connection.commit()
     return render_template('index.html')
-
-
-@app.route('/about')
-def about():
-    return render_template('about.html')
 
 
 if __name__ == "__main__":
